@@ -1,0 +1,353 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#vc-voice-log-notifications-container {
+    position: fixed;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    max-width: 440px;
+    width: calc(100vw - 48px);
+}
+
+.vc-voice-log-notif-position-bottom-right {
+    bottom: 28px;
+    right: 28px;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.vc-voice-log-notif-position-top-right {
+    top: 28px;
+    right: 28px;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.vc-voice-log-notif-position-bottom-left {
+    bottom: 28px;
+    left: 28px;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.vc-voice-log-notif-position-top-left {
+    top: 28px;
+    left: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.vc-voice-log-notif-card {
+    pointer-events: auto;
+    width: 390px;
+    background: rgba(18, 18, 20, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    padding: 18px 20px 20px 20px;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.vc-voice-log-notif-card:hover {
+    box-shadow: 0 14px 42px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Animations for right-aligned positions */
+.vc-voice-log-notif-position-bottom-right .vc-voice-log-notif-card,
+.vc-voice-log-notif-position-top-right .vc-voice-log-notif-card {
+    animation: vc-notif-slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.vc-voice-log-notif-position-bottom-right .vc-voice-log-notif-card.is-closing,
+.vc-voice-log-notif-position-top-right .vc-voice-log-notif-card.is-closing {
+    animation: vc-notif-slide-out-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animations for left-aligned positions */
+.vc-voice-log-notif-position-bottom-left .vc-voice-log-notif-card,
+.vc-voice-log-notif-position-top-left .vc-voice-log-notif-card {
+    animation: vc-notif-slide-in-left 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.vc-voice-log-notif-position-bottom-left .vc-voice-log-notif-card.is-closing,
+.vc-voice-log-notif-position-top-left .vc-voice-log-notif-card.is-closing {
+    animation: vc-notif-slide-out-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes vc-notif-slide-in-right {
+    0% {
+        opacity: 0;
+        transform: translateX(45px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes vc-notif-slide-out-right {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        max-height: 140px;
+        margin-bottom: 0;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(45px) scale(0.9);
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-bottom: -12px;
+        border: 0;
+    }
+}
+
+@keyframes vc-notif-slide-in-left {
+    0% {
+        opacity: 0;
+        transform: translateX(-45px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes vc-notif-slide-out-left {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        max-height: 140px;
+        margin-bottom: 0;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-45px) scale(0.9);
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-bottom: -12px;
+        border: 0;
+    }
+}
+
+.vc-voice-log-notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.vc-voice-log-notif-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-voice-log-notif-logo-icon {
+    width: 18px;
+    height: 18px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vc-voice-log-notif-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.95);
+    text-transform: uppercase;
+}
+
+.vc-voice-log-notif-dot-separator {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 12px;
+}
+
+.vc-voice-log-notif-status-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-voice-log-notif-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.vc-voice-log-notif-status-dot.join,
+.vc-voice-log-notif-status-dot.green {
+    background-color: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.65);
+}
+
+.vc-voice-log-notif-status-dot.leave,
+.vc-voice-log-notif-status-dot.red {
+    background-color: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.65);
+}
+
+.vc-voice-log-notif-status-dot.purple {
+    background-color: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.65);
+}
+
+.vc-voice-log-notif-status-dot.orange {
+    background-color: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.65);
+}
+
+.vc-voice-log-notif-status-dot.blue {
+    background-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.65);
+}
+
+.vc-voice-log-notif-status-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.vc-voice-log-notif-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-voice-log-notif-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.vc-voice-log-notif-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.vc-voice-log-notif-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
+
+.vc-voice-log-notif-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 6px;
+}
+
+.vc-voice-log-notif-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.vc-voice-log-notif-avatar:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.vc-voice-log-notif-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    line-height: 1.35;
+    overflow: hidden;
+}
+
+.vc-voice-log-notif-user {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.vc-voice-log-notif-user:hover {
+    text-decoration: underline;
+}
+
+.vc-voice-log-notif-message {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.vc-voice-log-notif-progress-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.vc-voice-log-notif-progress-bar {
+    height: 100%;
+    width: 100%;
+    animation: vc-notif-progress 5s linear forwards;
+}
+
+.vc-voice-log-notif-progress-bar.join,
+.vc-voice-log-notif-progress-bar.green {
+    background: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+
+.vc-voice-log-notif-progress-bar.leave,
+.vc-voice-log-notif-progress-bar.red {
+    background: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.vc-voice-log-notif-progress-bar.purple {
+    background: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+.vc-voice-log-notif-progress-bar.orange {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.vc-voice-log-notif-progress-bar.blue {
+    background: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+@keyframes vc-notif-progress {
+    0% { width: 100%; }
+    100% { width: 0%; }
+}
