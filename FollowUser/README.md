@@ -95,5 +95,3 @@ Este plugin é parte do Vencord e está licenciado sob GPL-3.0-or-later.
 ---
 
 <p align="center">Feito com ❤️ por <b>Guih</b></p>
-
-
