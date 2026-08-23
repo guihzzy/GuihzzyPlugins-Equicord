@@ -1,52 +1,31 @@
 # Plugin FakeDeafen
 
 ## 📝 Descrição
-O **FakeDeafen** é um plugin que faz parecer que você está surdo para outros usuários na call, enquanto você continua ouvindo e falando normalmente. Os botões de microfone e áudio ficam como se você estivesse ativo, mas os outros veem o ícone de surdo.
+O **FakeDeafen** é um plugin que intercepta os pacotes do WebSocket do Discord para fazer parecer que você está surdo para outros usuários, enquanto na verdade você ainda pode ouvir tudo normalmente. Isso é útil quando você quer parecer offline ou indisponível, mas ainda precisa ouvir o que está acontecendo no canal de voz.
 
 > ⚠️ **Atenção:** Este plugin modifica o comportamento do WebSocket do Discord. Use com responsabilidade.
 
 ## ✨ Funcionalidades
-- 🎭 **Surdez Falsa**: Outros usuários veem você como surdo na call
-- 🔊 **Áudio Preservado**: Você continua ouvindo e falando normalmente — os botões de mute/deafen ficam normais
-- 🔘 **Botão Toggle**: Botão dedicado ao lado dos controles de voz — um clique para ativar, um clique para desativar
-- 🔔 **Notificações**: Avisa quando o Fake Deafen é ativado/desativado
-- 🔌 **Interceptação WebSocket**: Bloqueia pacotes `self_deaf: false` para manter o estado no servidor
-- 🛡️ **Proteção do Botão Nativo**: Se clicar no botão de deafen nativo do Discord enquanto o fake está ativo, o estado é restaurado automaticamente
-- 🔇 **Preservação do Mute**: O estado do mute do microfone é preservado ao ativar/desativar o fake deafen
+- 🎭 **Surdez Falsa**: Finge que você está surdo para outros usuários
+- 🔊 **Áudio Preservado**: Você ainda pode ouvir o áudio normalmente
+- 🔔 **Notificações**: Avisa quando o modo fake deafen é ativado/desativado
+- 🔌 **Interceptação WebSocket**: Intercepta pacotes do WebSocket para manter o estado de "surdo"
+- 🛡️ **Proteção Automática**: Bloqueia pacotes que tentam desativar a surdez
 
 ## 🚀 Como Usar
 1. **Ative o plugin**: Vá em **Configurações de Usuário > Vencord > Plugins** e ative o **FakeDeafen**.
 2. **Entre em um canal de voz**: Conecte-se a qualquer canal de voz no Discord.
-3. **Clique no botão Fake Deafen**: Um botão de headphones aparecerá ao lado dos botões de mute/deafen na barra de controle de voz. Clique para ativar.
-4. **Desative quando quiser**: Clique no mesmo botão novamente para voltar ao normal.
-
-### Estados do Botão
-| Estado | Aparência do Botão | Significado |
-|--------|-------------------|-------------|
-| Desativado | Ícone de headphones normal | Estado normal, sem fake deafen |
-| Ativado | Ícone de headphones com risco vermelho + brilho vermelho | Você aparece como surdo para os outros, mas ouve normalmente |
+3. **Ative a surdez**: Use o atalho padrão do Discord (Ctrl+Shift+D) ou clique no botão de surdez no painel de voz.
+4. **Mantenha-se "surdo"**: O plugin automaticamente interceptará os pacotes e manterá você "surdo" visualmente, mas ainda audível para você.
 
 ## ⚙️ Como Funciona
 
-O plugin usa a técnica de **double-toggle** para criar uma dessincronização entre o estado local e o estado do servidor:
+O plugin funciona interceptando os pacotes do WebSocket que o Discord envia quando você tenta desativar a surdez. Quando você ativa a surdez, o plugin:
 
-### Ativando o Fake Deafen
-1. Inicia a interceptação do WebSocket (bloqueia `self_deaf: false`)
-2. Ativa o deafen via `toggleSelfDeaf()` → envia `self_deaf: true` pro servidor e muta localmente
-3. Aguarda 150ms para o pacote ser enviado
-4. Desativa o deafen localmente via `toggleSelfDeaf()` → tenta enviar `self_deaf: false` → **BLOQUEADO** pelo interceptor
-5. Resultado: o servidor acha que você está surdo, mas localmente você ouve e fala normalmente
-
-### Desativando o Fake Deafen
-1. Para a interceptação do WebSocket
-2. Faz o double-toggle reverso para enviar `self_deaf: false` pro servidor
-3. Tudo volta ao normal
-
-### Interceptação WebSocket
-O plugin sobrescreve `WebSocket.prototype.send` e filtra:
-- Pacotes JSON com `self_deaf: false` — descartados
-- Pacotes ArrayBuffer contendo `self_deafs\x05false` — descartados
-- Todos os outros pacotes — passam normalmente
+1. Sobrescreve o método `send` do `WebSocket.prototype`
+2. Filtra pacotes que tentam desativar a surdez (`self_deaf: false`)
+3. Descarta esses pacotes, mantendo você "surdo" para outros usuários
+4. Permite que todos os outros pacotes passem normalmente
 
 > ⚠️ **Nota:** O plugin pode não funcionar se o Discord mudar a estrutura dos pacotes em atualizações futuras.
 
@@ -62,7 +41,7 @@ Você precisa ter o **Vencord** instalado via código-fonte (não a versão `.ex
    Crie uma pasta chamada `fakeDeafen` dentro de `plugins`.
 
 3. **Adicione os arquivos:**
-   Coloque o arquivo `index.tsx` dentro da pasta `fakeDeafen`.
+   Coloque o arquivo `index.ts` dentro da pasta `fakeDeafen`.
 
 4. **Recompile o Vencord:**
    Abra o terminal na pasta do Vencord e execute:
@@ -80,4 +59,5 @@ Este plugin é parte do ecossistema Vencord e está licenciado sob **GPL-3.0-or-
 
 ---
 
-Desenvolvido com ❤️ por **guihzzy**
+<p align="center">Feito com ❤️ por <b>Guih</b></p>
+
