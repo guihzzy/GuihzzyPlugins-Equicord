@@ -21,3 +21,7 @@ Nas opções do plugin dentro das configurações do Equicord, você pode altera
 ## Instalação
 
 Copie a pasta `voiceHandoff` para dentro do seu diretório de plugins do Equicord (`src/equicordplugins/`) e faça a build do client normalmente.
+
+---
+
+<p align="center">Feito com ❤️ por <b>Guih</b></p>
