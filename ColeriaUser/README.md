@@ -53,10 +53,7 @@ Você precisa ter o **Vencord** instalado via código-fonte (não a versão `.ex
    - Reinicie o Discord.
    - Vá em **Configurações de Usuário > Vencord > Plugins**.
    - Procure por `ColeriaUser` e ative.
-
-## 📝 Licença
-Este plugin é parte do ecossistema Vencord e está licenciado sob **GPL-3.0-or-later**.
-
+   
 ---
 
-Desenvolvido com ❤️ por **guihzzy**
+<p align="center">Feito com ❤️ por <b>Guih</b></p>
