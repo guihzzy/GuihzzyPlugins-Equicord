@@ -40,4 +40,3 @@ Nas opções do plugin dentro das configurações do Equicord, você pode person
 ---
 
 <p align="center">Feito com ❤️ por <b>Guih</b></p>
-
