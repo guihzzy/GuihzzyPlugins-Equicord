@@ -1,4 +1,4 @@
-# 🚀 Guihzzy Plugins — Equicord
+<p align="center"> # 🚀 Guihzzy Plugins — Equicord
 
 <p align="center">
   <b>Coleção de plugins personalizados para o Equicord / Vencord desenvolvidos por Guih.</b>
