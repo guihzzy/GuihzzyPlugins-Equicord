@@ -8,7 +8,7 @@ import { classes } from "@utils/misc";
 import { Channel, RenderModalProps } from "@vencord/discord-types";
 import { AccessibilityStore, Modal, openModal, React, ScrollerThin } from "@webpack/common";
 
-import { clearLogs, getVcLogs, vcLogSubscribe } from "../logs";
+import { clearLogs, exportLogsToJson, getVcLogs, vcLogSubscribe } from "../logs";
 import { cl } from "../utils";
 import { VoiceChannelLogEntryComponent } from "./VoiceChannelLogEntryComponent";
 
@@ -25,10 +25,15 @@ export function VoiceChannelLogModal({ channel, props }: { channel: Channel; pro
         <Modal
             {...props}
             size="lg"
-            title={`${channel.name} logs`}
+            title={`Logs de Voz: ${channel.name ?? "Canal de Voz"}`}
             actions={[
                 {
-                    text: "Clear logs",
+                    text: "Exportar Logs (.json)",
+                    variant: "primary",
+                    onClick: () => exportLogsToJson(channel)
+                },
+                {
+                    text: "Limpar logs",
                     variant: "dangerPrimary",
                     onClick: () => clearLogs(channel.id)
                 }
@@ -37,11 +42,23 @@ export function VoiceChannelLogModal({ channel, props }: { channel: Channel; pro
             <ScrollerThin fade className={classes(cl("scroller"), `group-spacing-${AccessibilityStore.messageGroupSpacing}`)}>
                 {logs.length > 0 ? logs.map((entry, i) => {
                     const elements: React.ReactNode[] = [];
+                    const dateStr = entry.timestamp.toLocaleDateString("pt-BR", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    });
+                    const prevDateStr = i > 0 ? logs[i - 1].timestamp.toLocaleDateString("pt-BR", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    }) : null;
 
-                    if (i === 0 || entry.timestamp.toDateString() !== logs[i - 1].timestamp.toDateString()) {
+                    if (i === 0 || dateStr !== prevDateStr) {
                         elements.push(
-                            <div key={`sep-${i}`} className={cl("date-separator")} role="separator" aria-label={entry.timestamp.toDateString()}>
-                                <span>{entry.timestamp.toDateString()}</span>
+                            <div key={`sep-${i}`} className={cl("date-separator")} role="separator" aria-label={dateStr}>
+                                <span>{dateStr}</span>
                             </div>
                         );
                     }
@@ -52,7 +69,7 @@ export function VoiceChannelLogModal({ channel, props }: { channel: Channel; pro
 
                     return elements;
                 }) : (
-                    <div className={cl("empty")}>No logs to display.</div>
+                    <div className={cl("empty")}>Nenhum registro de voz para exibir.</div>
                 )}
             </ScrollerThin>
         </Modal>

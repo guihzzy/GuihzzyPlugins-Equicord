@@ -75,6 +75,8 @@ const iconMap: Record<LogEventType, () => React.ReactNode> = {
     leave: LeaveIcon,
     move: MoveIcon,
     soundboard: SoundboardIcon,
+    self_mute: MuteIcon,
+    self_deaf: DeafenIcon,
     server_mute: MuteIcon,
     server_deafen: DeafenIcon,
     self_video: VideoIcon,
@@ -88,6 +90,8 @@ const colorMap: Record<LogEventType, string> = {
     leave: "danger",
     move: "warning",
     soundboard: "brand",
+    self_mute: "warning",
+    self_deaf: "warning",
     server_mute: "danger",
     server_deafen: "danger",
     self_video: "positive",
@@ -97,6 +101,7 @@ const colorMap: Record<LogEventType, string> = {
 };
 
 export default function EventIcon({ type }: { type: LogEventType; }) {
-    const IconComponent = iconMap[type];
-    return <div className={classes(cl("icon"), cl(`icon-${colorMap[type]}`))}><IconComponent /></div>;
+    const IconComponent = iconMap[type] ?? JoinIcon;
+    const color = colorMap[type] ?? "brand";
+    return <div className={classes(cl("icon"), cl(`icon-${color}`))}>{IconComponent()}</div>;
 }

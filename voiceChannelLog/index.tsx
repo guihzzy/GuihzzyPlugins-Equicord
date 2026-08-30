@@ -57,7 +57,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
     children.push(
         <Menu.MenuItem
             id="vc-view-voice-channel-logs"
-            label="View Voice Channel Logs"
+            label="Ver Logs do Canal de Voz"
             action={() => openVoiceChannelLog(channel)}
         />
     );
@@ -65,7 +65,7 @@ const patchChannelContextMenu: NavContextMenuPatchCallback = (children, { channe
 
 export default definePlugin({
     name: "VoiceChannelLog",
-    description: "Logs voice channel activity including joins, leaves, soundboard, mute, camera, screenshare, and more.",
+    description: "Registra detalhadamente toda a atividade do canal de voz: entradas, saídas, mutar/desmutar, ensurdecer, câmera, telas compartilhadas, soundboard e exportação em .JSON.",
     tags: ["Servers", "Utility", "Voice"],
     authors: [Devs.Sqaaakoi, Devs.thororen, EquicordDevs.nyx, Devs.Moxxie, EquicordDevs.Fres, Devs.amy],
     dependencies: ["AudioPlayerAPI", "HeaderBarAPI"],
@@ -75,7 +75,7 @@ export default definePlugin({
     },
 
     toolboxActions: {
-        "Voice Channel Logs"() {
+        "Logs do Canal de Voz"() {
             const channelId = SelectedChannelStore.getVoiceChannelId();
             if (!channelId) return;
             const channel = ChannelStore.getChannel(channelId);
@@ -127,6 +127,8 @@ export default definePlugin({
                     previousStates.set(userId, {
                         mute: state.mute,
                         deaf: state.deaf,
+                        selfMute: state.selfMute,
+                        selfDeaf: state.selfDeaf,
                         selfVideo: state.selfVideo,
                         selfStream: state.selfStream ?? false,
                         channelId
@@ -160,19 +162,32 @@ export default definePlugin({
                 }
 
                 if (prev && channelId && inMyChannel) {
-                    if (settings.store.logMuteDeafen) {
-                        if (state.mute !== prev.mute) {
-                            log({ type: "server_mute", userId, channelId, enabled: state.mute });
-                        }
-                        if (state.deaf !== prev.deaf) {
-                            log({ type: "server_deafen", userId, channelId, enabled: state.deaf });
-                        }
+                    // 1. Mutar / Desmutar a si mesmo (Microfone)
+                    if (settings.store.logSelfMuteDeafen && state.selfMute !== prev.selfMute) {
+                        log({ type: "self_mute", userId, channelId, enabled: state.selfMute });
                     }
 
+                    // 2. Ensurdecer / Desensurdecer a si mesmo (Fone)
+                    if (settings.store.logSelfMuteDeafen && state.selfDeaf !== prev.selfDeaf) {
+                        log({ type: "self_deaf", userId, channelId, enabled: state.selfDeaf });
+                    }
+
+                    // 3. Mutado / Desmutado pelo servidor
+                    if (settings.store.logMuteDeafen && state.mute !== prev.mute) {
+                        log({ type: "server_mute", userId, channelId, enabled: state.mute });
+                    }
+
+                    // 4. Ensurdecido / Desensurdecido pelo servidor
+                    if (settings.store.logMuteDeafen && state.deaf !== prev.deaf) {
+                        log({ type: "server_deafen", userId, channelId, enabled: state.deaf });
+                    }
+
+                    // 5. Câmera / Vídeo
                     if (settings.store.logVideo && state.selfVideo !== prev.selfVideo) {
                         log({ type: "self_video", userId, channelId, enabled: state.selfVideo });
                     }
 
+                    // 6. Transmissão de tela / Compartilhamento
                     if (settings.store.logStream && (state.selfStream ?? false) !== prev.selfStream) {
                         log({ type: "self_stream", userId, channelId, enabled: state.selfStream ?? false });
                     }
@@ -181,6 +196,8 @@ export default definePlugin({
                 previousStates.set(userId, {
                     mute: state.mute,
                     deaf: state.deaf,
+                    selfMute: state.selfMute,
+                    selfDeaf: state.selfDeaf,
                     selfVideo: state.selfVideo,
                     selfStream: state.selfStream ?? false,
                     channelId
@@ -233,7 +250,7 @@ export default definePlugin({
             if (app) {
                 logWithName(app.name);
             } else {
-                fetchApplication(appId).then(fetched => logWithName(fetched?.name ?? "Unknown activity")).catch(() => logWithName("Unknown activity"));
+                fetchApplication(appId).then(fetched => logWithName(fetched?.name ?? "Atividade Desconhecida")).catch(() => logWithName("Atividade Desconhecida"));
             }
         },
 
@@ -267,6 +284,8 @@ export default definePlugin({
                 previousStates.set(userId, {
                     mute: s.mute,
                     deaf: s.deaf,
+                    selfMute: s.selfMute,
+                    selfDeaf: s.selfDeaf,
                     selfVideo: s.selfVideo,
                     selfStream: s.selfStream ?? false,
                     channelId: clientOldChannelId

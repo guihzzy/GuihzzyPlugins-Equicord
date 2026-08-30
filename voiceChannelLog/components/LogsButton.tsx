@@ -31,7 +31,7 @@ export function OpenLogsButton() {
         <HeaderBarButton
             className={cl("toolbar-btn")}
             onClick={() => openVoiceChannelLog(channel)}
-            tooltip="Voice Channel Logs"
+            tooltip="Logs do Canal de Voz"
             icon={LogIcon}
         />
     );

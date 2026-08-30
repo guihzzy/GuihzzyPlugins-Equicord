@@ -11,6 +11,8 @@ export type LogEventType =
     | "leave"
     | "move"
     | "soundboard"
+    | "self_mute"
+    | "self_deaf"
     | "server_mute"
     | "server_deafen"
     | "self_video"
@@ -75,6 +77,8 @@ export interface EmbeddedActivityEvent {
 export interface PreviousVoiceState {
     mute: boolean;
     deaf: boolean;
+    selfMute: boolean;
+    selfDeaf: boolean;
     selfVideo: boolean;
     selfStream: boolean;
     channelId?: string;

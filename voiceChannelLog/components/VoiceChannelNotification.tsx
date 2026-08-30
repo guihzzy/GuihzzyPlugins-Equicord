@@ -65,6 +65,26 @@ function getNotificationDetails(entry: Omit<VoiceChannelLogEntry, "timestamp">, 
             actionText = pt ? "saiu do canal de voz!" : "left the voice channel!";
             colorClass = "red";
             break;
+        case "self_mute":
+            statusText = pt ? "Microfone" : "Microphone";
+            if (entry.enabled) {
+                actionText = pt ? "mutou o próprio microfone!" : "muted their microphone!";
+                colorClass = "orange";
+            } else {
+                actionText = pt ? "desmutou o microfone!" : "unmuted their microphone!";
+                colorClass = "green";
+            }
+            break;
+        case "self_deaf":
+            statusText = pt ? "Fone de Ouvido" : "Headphones";
+            if (entry.enabled) {
+                actionText = pt ? "ensurdeceu o áudio (fone desativado)!" : "deafened audio!";
+                colorClass = "red";
+            } else {
+                actionText = pt ? "reativou o áudio do fone!" : "undeafened audio!";
+                colorClass = "green";
+            }
+            break;
         case "self_video":
             statusText = pt ? "Câmera" : "Camera";
             if (entry.enabled) {
@@ -86,23 +106,23 @@ function getNotificationDetails(entry: Omit<VoiceChannelLogEntry, "timestamp">, 
             }
             break;
         case "server_mute":
-            statusText = pt ? "Mutado" : "Muted";
+            statusText = pt ? "Mutado Servidor" : "Server Muted";
             if (entry.enabled) {
                 actionText = pt ? "foi mutado no servidor!" : "was server muted!";
                 colorClass = "red";
             } else {
-                statusText = pt ? "Desmutado" : "Unmuted";
+                statusText = pt ? "Desmutado Servidor" : "Server Unmuted";
                 actionText = pt ? "foi desmutado no servidor!" : "was server unmuted!";
                 colorClass = "green";
             }
             break;
         case "server_deafen":
-            statusText = pt ? "Ensurdecido" : "Deafened";
+            statusText = pt ? "Ensurdecido Servidor" : "Server Deafened";
             if (entry.enabled) {
                 actionText = pt ? "foi ensurdecido no servidor!" : "was server deafened!";
                 colorClass = "red";
             } else {
-                statusText = pt ? "Áudio Liberado" : "Undeafened";
+                statusText = pt ? "Áudio Liberado" : "Server Undeafened";
                 actionText = pt ? "teve o áudio liberado no servidor!" : "was server undeafened!";
                 colorClass = "green";
             }
