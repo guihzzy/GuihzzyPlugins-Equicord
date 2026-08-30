@@ -18,9 +18,10 @@ Esta pasta reúne ferramentas exclusivas focadas em utilidades de voz, notifica�
 
 | Plugin | Descrição | Categoria |
 | :--- | :--- | :--- |
+| **QuickEdit** | Edita mensagens próprias ou abre configurações de canais (texto, voz, categorias, tópicos) com duplo clique esquerdo. | `Chat` `Shortcuts` `Utility` |
+| **VoiceChannelLog** | Registra histórico detalhado de voz (entradas, saídas, microfone mutado/desmutado, fone ensurdecido, câmeras, telas, soundboard e exportação em .JSON). | `Voice` `Utility` |
 | **CallKeeper** | Transfere automaticamente a chamada do celular para o PC quando a outra pessoa sair de uma DM ou Group DM, evitando que a call caia. | `Voice` `Utility` |
 | **VoiceHandoff** | Conecta o PC automaticamente na call de um usuário marcado assim que você se desconecta do celular. | `Voice` `Utility` |
-| **VoiceChannelLog** | Registra histórico detalhado de eventos em canais de voz (entradas, saídas, câmeras, transmissões, soundboard, etc.). | `Voice` `Utility` |
 | **DMGroupsNotification** | Sistema avançado de notificações e alertas específicos para grupos de DM. | `Notifications` `Utility` |
 | **FollowUser** | Segue e acompanha automaticamente amigos selecionados entre canais de voz. | `Voice` `Utility` |
 | **ColeriaUser** | Ferramenta complementar para monitoramento e acompanhamento em chamadas. | `Voice` `Utility` |
