@@ -13,19 +13,27 @@ import { ChannelType } from "@vencord/discord-types/enums";
 import { ChannelActions, ChannelStore, Menu, React, SelectedChannelStore, showToast, Toasts, UserStore, VoiceStateStore } from "@webpack/common";
 
 const lastUserChannels = new Map<string, string>();
+let lastMyChannelId: string | null = null;
+let lastMyChannelTime = 0;
 
 const settings = definePluginSettings({
     notifyOnTransfer: {
         type: OptionType.BOOLEAN,
         default: true,
         description: "Exibir notificação quando a chamada for transferida para o PC."
+    },
+    onlyDms: {
+        type: OptionType.BOOLEAN,
+        default: true,
+        description: "Apenas transferir chamadas de DMs e Grupos (ignorar canais de servidores)."
     }
 }).withPrivateSettings<{
     monitoredUsers?: string[];
 }>();
 
 function isDmOrGroupDm(channel: Channel | undefined): boolean {
-    if (!channel || channel.guild_id) return false;
+    if (!channel) return true;
+    if (channel.guild_id) return false;
     return (
         (typeof channel.isDM === "function" && channel.isDM()) ||
         (typeof channel.isGroupDM === "function" && channel.isGroupDM()) ||
@@ -56,6 +64,10 @@ const UserContextMenuPatch: NavContextMenuPatchCallback = (children, { user }: {
                 } else {
                     settings.store.monitoredUsers = [...current, user.id];
                     setChecked(true);
+                    const vs = VoiceStateStore.getVoiceStateForUser(user.id);
+                    if (vs?.channelId) {
+                        lastUserChannels.set(user.id, vs.channelId);
+                    }
                 }
             }}
         />
@@ -84,19 +96,38 @@ export default definePlugin({
             if (!myId) return;
 
             const monitoredUsers = settings.store.monitoredUsers ?? [];
+            const previousMyChannelId = lastMyChannelId;
+            const previousMyChannelTime = lastMyChannelTime;
 
+            // Primeiro: Atualiza o estado da própria conta
+            for (const voiceState of voiceStates) {
+                if (voiceState.userId === myId) {
+                    if (voiceState.channelId) {
+                        lastMyChannelId = voiceState.channelId;
+                        lastMyChannelTime = Date.now();
+                        lastUserChannels.set(myId, voiceState.channelId);
+                    } else {
+                        lastUserChannels.delete(myId);
+                        lastMyChannelTime = Date.now();
+                    }
+                }
+            }
+
+            // Segundo: Verifica eventos de saída dos usuários monitorados
             for (const voiceState of voiceStates) {
                 const { userId, channelId } = voiceState;
-                const oldChannelId = voiceState.oldChannelId ?? lastUserChannels.get(userId);
 
+                // Ignora se for a própria conta
+                if (userId === myId) continue;
+
+                const oldChannelId = voiceState.oldChannelId ?? lastUserChannels.get(userId) ?? VoiceStateStore.getVoiceStateForUser(userId)?.channelId;
+
+                // Atualiza o mapa de canais
                 if (channelId) {
                     lastUserChannels.set(userId, channelId);
                 } else {
                     lastUserChannels.delete(userId);
                 }
-
-                // Se quem saiu foi o próprio usuário atual, não executa nenhuma ação de transferência
-                if (userId === myId) continue;
 
                 // Apenas monitora se o CallKeeper estiver ativado para essa pessoa
                 if (!monitoredUsers.includes(userId)) continue;
@@ -108,36 +139,70 @@ export default definePlugin({
 
                 if (!leftChannelId) continue;
 
-                // Validação: A chamada precisa ser uma DM ou Group DM (ignora servidores)
-                const channel = ChannelStore.getChannel(leftChannelId);
-                if (!isDmOrGroupDm(channel)) continue;
+                // Validação: Verificar se é DM/Grupo se configurado
+                if (settings.store.onlyDms) {
+                    const channel = ChannelStore.getChannel(leftChannelId);
+                    if (!isDmOrGroupDm(channel)) continue;
+                }
 
-                // Validação: Eu ainda estou conectado à mesma chamada pelo celular/outro client
-                const myVoiceState = VoiceStateStore.getVoiceStateForUser(myId);
-                if (myVoiceState?.channelId !== leftChannelId) continue;
+                // Validação: Eu estava na mesma chamada (no mobile ou outro client)
+                const currentMyVoiceState = VoiceStateStore.getVoiceStateForUser(myId);
+                const wasInSameCall =
+                    currentMyVoiceState?.channelId === leftChannelId ||
+                    previousMyChannelId === leftChannelId ||
+                    lastMyChannelId === leftChannelId ||
+                    (Date.now() - previousMyChannelTime < 20000 && previousMyChannelId === leftChannelId);
 
-                // Validação: Se você já estiver em call pelo PC/Desktop, não faz nada
+                if (!wasInSameCall) continue;
+
+                // Validação: Se você já estiver conectado em chamada pelo PC, não faz nada
                 const pcVoiceChannelId = SelectedChannelStore.getVoiceChannelId();
                 if (pcVoiceChannelId) continue;
 
-                // Todas as condições atendidas: transferir conexão para o PC
-                ChannelActions.selectVoiceChannel(leftChannelId);
+                // Todas as condições atendidas: transferir conexão para o PC fora do ciclo de dispatch
+                setTimeout(() => {
+                    const currentPcVoice = SelectedChannelStore.getVoiceChannelId();
+                    if (currentPcVoice) return;
 
-                if (settings.store.notifyOnTransfer) {
-                    showToast("CallKeeper: Chamada transferida para o PC.", Toasts.Type.SUCCESS);
-                }
+                    ChannelActions.selectVoiceChannel(leftChannelId);
+
+                    if (settings.store.notifyOnTransfer) {
+                        showToast("CallKeeper: Chamada transferida para o PC.", Toasts.Type.SUCCESS);
+                    }
+                }, 100);
             }
         }
     },
     start() {
         lastUserChannels.clear();
+        lastMyChannelId = null;
+        lastMyChannelTime = 0;
 
         const myId = UserStore.getCurrentUser()?.id;
         if (myId) {
             const myState = VoiceStateStore.getVoiceStateForUser(myId);
             if (myState?.channelId) {
+                lastMyChannelId = myState.channelId;
+                lastMyChannelTime = Date.now();
                 lastUserChannels.set(myId, myState.channelId);
             }
+        }
+
+        try {
+            const allStates = VoiceStateStore.getAllVoiceStates?.();
+            if (allStates) {
+                for (const guildId in allStates) {
+                    const guildStates = allStates[guildId];
+                    for (const uId in guildStates) {
+                        const vs = guildStates[uId];
+                        if (vs?.channelId) {
+                            lastUserChannels.set(uId, vs.channelId);
+                        }
+                    }
+                }
+            }
+        } catch {
+            // Ignora se não suportado
         }
 
         const monitoredUsers = settings.store.monitoredUsers ?? [];
@@ -150,5 +215,7 @@ export default definePlugin({
     },
     stop() {
         lastUserChannels.clear();
+        lastMyChannelId = null;
+        lastMyChannelTime = 0;
     }
 });
