@@ -18,6 +18,7 @@ Esta pasta reúne ferramentas exclusivas focadas em utilidades de voz, notifica�
 
 | Plugin | Descrição | Categoria |
 | :--- | :--- | :--- |
+| **CallTimer** | Exibe no topo da chamada o tempo decorrido em tempo real para DMs, Grupos e Canais de Voz (buscando o início exato em DMs). | `Voice` `Appearance` `Utility` |
 | **QuickEdit** | Edita mensagens próprias ou abre configurações de canais (texto, voz, categorias, tópicos) com duplo clique esquerdo. | `Chat` `Shortcuts` `Utility` |
 | **VoiceChannelLog** | Registra histórico detalhado de voz (entradas, saídas, microfone mutado/desmutado, fone ensurdecido, câmeras, telas, soundboard e exportação em .JSON). | `Voice` `Utility` |
 | **CallKeeper** | Transfere automaticamente a chamada do celular para o PC quando a outra pessoa sair de uma DM ou Group DM, evitando que a call caia. | `Voice` `Utility` |
